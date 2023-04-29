@@ -153,7 +153,7 @@ class FlutterwaveProcessor
 
         $paymentArgs = apply_filters('wppayform_flutterwave_payment_args', $paymentArgs, $submission, $transaction, $form);
         $payment = (new IPN())->makeApiCall('payments', $paymentArgs, $form->ID, 'POST');
-dd($payment);
+
         $paymentLink = Arr::get($payment,'data.link');
 
         if (is_wp_error($payment)) {
@@ -184,23 +184,24 @@ dd($payment);
             // 'nextAction' => 'payment',
             'call_next_method' => 'normalRedirect',
             'redirect_url' => $paymentLink,
-            'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-payment-for-paymattic'),
+            'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-for-paymattic'),
         ], 200);
     }
 
     public function handleSessionRedirectBack($data)
     {
 
+        
         $submissionId = intval($data['wppayform_payment']);
         $submission = (new Submission())->getSubmission($submissionId);
         $transaction = $this->getLastTransaction($submissionId);
 
         $transactionId = Arr::get($data, 'transaction_id');
-        $status = Arr::get($data, 'status');
+        $paymentStatus = Arr::get($data, 'status');
 
         $payment = (new IPN())->makeApiCall('transactions/'.$transactionId . '/verify', [], $submission->form_id);
-       
-        if(!$payment || $payment->status == 'error') {
+
+        if(!$payment || is_wp_error($payment)) {
             return;
         }
 
@@ -215,8 +216,8 @@ dd($payment);
         }
 
         $transaction = $this->getLastTransaction($submissionId);
-
-        if (!$transaction || $transaction->payment_method != $this->method || $transaction->status === 'paid' || $status == 'successful') {
+        
+        if (!$transaction || $transaction->payment_method != $this->method || $transaction->status === 'paid' || $paymentStatus != 'successful') {
             return;
         }
         
@@ -308,7 +309,7 @@ dd($payment);
             'submission_id' => $transaction->submission_id,
             'type' => 'info',
             'created_by' => 'PayForm Bot',
-            'content' => sprintf(__('Transaction Marked as paid and flutterwave Transaction ID: %s', 'flutterwave-payment-for-paymattic'), $data['charge_id'])
+            'content' => sprintf(__('Transaction Marked as paid and flutterwave Transaction ID: %s', 'flutterwave-for-paymattic'), $data['charge_id'])
         ));
 
         do_action('wppayform/form_payment_success_flutterwave', $submission, $transaction, $transaction->form_id, $updateData);
@@ -318,7 +319,7 @@ dd($payment);
     public function validateSubscription($paymentItems)
     {
         wp_send_json_error(array(
-            'message' => __('Subscription with flutterwave is not supported yet!', 'flutterwave-payment-for-paymattic'),
+            'message' => __('Subscription with flutterwave is not supported yet!', 'flutterwave-for-paymattic'),
             'payment_error' => true
         ), 423);
     }

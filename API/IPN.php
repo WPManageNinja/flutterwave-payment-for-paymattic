@@ -102,33 +102,25 @@ class IPN
 
     public function makeApiCall($path, $args, $formId, $method = 'GET')
     {
-        // dd(json_encode($args));
-       
         $apiKeys = (new FlutterwaveSettings())->getApiKeys($formId);
         $secretKey = Arr::get($apiKeys, 'api_secret');
-        
-        // $headers = [
-        //     'Authorization' => 'Bearer ' . $secretKey  
-        // ];
 
-            $headers = [
-                'Authorization' => 'Bearer ' . $secretKey,
-                // 'Authorization' =>  "Bearer FLWSECK_TEST-bbf2ce75cdca2bdaea23d1b2beb4ccc6-X",
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ];
+        $headers = [
+            'Authorization' => 'Bearer ' . $secretKey,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
 
         if ($method == 'POST') {
             $response = wp_remote_post('https://api.flutterwave.com/v3/'.$path, [
                 'headers' => $headers,
                 'body' => json_encode($args)
             ]);
-            dd($response,$args, $headers, 'from post');
         } else {
             $response = wp_remote_get('https://api.flutterwave.com/v3/'.$path, [
                 'headers' => $headers,
-                'body' => json_encode($args)
             ]);
+            
         }
 
         if (is_wp_error($response)) {

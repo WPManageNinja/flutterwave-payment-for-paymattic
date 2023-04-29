@@ -37,7 +37,7 @@ add_action('wppayform_loaded', function () {
          add_action('admin_notices', function () {
             if (current_user_can('activate_plugins')) {
                 echo '<div class="notice notice-error"><p>';
-                echo __('Please install & Activate Paymattic Pro to use flutterwave-payment-for-paymattic plugin.', 'flutterwave-payment-for-paymattic');
+                echo __('Please install & Activate Paymattic Pro to use flutterwave-for-paymattic plugin.', 'flutterwave-for-paymattic');
                 echo '</p></div>';
             }
         });
@@ -55,7 +55,7 @@ add_action('wppayform_loaded', function () {
             add_action('admin_notices', function () {
                 if (current_user_can('activate_plugins')) {
                     echo '<div class="notice notice-error"><p>';
-                    echo __('Please update Paymattic and Paymattic Pro to use flutterwave-payment-for-paymattic plugin!', 'flutterwave-payment-for-paymattic');
+                    echo __('Please update Paymattic and Paymattic Pro to use flutterwave-for-paymattic plugin!', 'flutterwave-for-paymattic');
                     echo '</p></div>';
                 }
             });

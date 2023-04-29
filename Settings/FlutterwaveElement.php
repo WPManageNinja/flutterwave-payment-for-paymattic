@@ -61,7 +61,7 @@ class FlutterwaveElement extends BaseComponent
                 )
             ),
             'field_options' => array(
-                'label' => __('Flutterwave Payment Gateway', 'flutterwave-payment-for-paymattic')
+                'label' => __('Flutterwave Payment Gateway', 'flutterwave-for-paymattic')
             )
         );
     }
