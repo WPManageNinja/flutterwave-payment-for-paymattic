@@ -33,7 +33,7 @@ define('FLUTTERWAVE_FOR_PAYMATTIC_VERSION', '1.0.0');
 
 add_action('wppayform_loaded', function () {
 
-   if (!defined('WPPAYFORMPRO_DIR_PATH') || !defined('WPPAYFORM_VERSION')) { 
+   if (!defined('WPPAYFORMPRO_DIR_PATH') || !defined('WPPAYFORM_VERSION') || !defined('WPPAYFORMPRO_VERSION')) { 
          add_action('admin_notices', function () {
             if (current_user_can('activate_plugins')) {
                 echo '<div class="notice notice-error"><p>';
