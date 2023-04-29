@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 use WPPayForm\Framework\Support\Arr;
 use WPPayForm\App\Models\Submission;
-use FlutterwavePaymentForPaymattic\Settings\FlutterwaveSettings;
+use FlutterwaveForPaymattic\Settings\FlutterwaveSettings;
 use WPPayForm\App\Models\Transaction;
 
 class IPN
@@ -107,9 +107,16 @@ class IPN
         $apiKeys = (new FlutterwaveSettings())->getApiKeys($formId);
         $secretKey = Arr::get($apiKeys, 'api_secret');
         
-        $headers = [
-            'Authorization' => 'Bearer ' . $secretKey  
-        ];
+        // $headers = [
+        //     'Authorization' => 'Bearer ' . $secretKey  
+        // ];
+
+            $headers = [
+                'Authorization' => 'Bearer ' . $secretKey,
+                // 'Authorization' =>  "Bearer FLWSECK_TEST-bbf2ce75cdca2bdaea23d1b2beb4ccc6-X",
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ];
 
         if ($method == 'POST') {
             $response = wp_remote_post('https://api.flutterwave.com/v3/'.$path, [

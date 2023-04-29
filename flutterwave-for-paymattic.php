@@ -33,7 +33,7 @@ define('FLUTTERWAVE_FOR_PAYMATTIC_VERSION', '1.0.0');
 
 add_action('wppayform_loaded', function () {
 
-   if (!defined('WPPAYFORMHASPRO') || !defined('WPPAYFORM_VERSION')) { 
+   if (!defined('WPPAYFORMPRO_DIR_PATH') || !defined('WPPAYFORM_VERSION')) { 
          add_action('admin_notices', function () {
             if (current_user_can('activate_plugins')) {
                 echo '<div class="notice notice-error"><p>';
@@ -41,12 +41,8 @@ add_action('wppayform_loaded', function () {
                 echo '</p></div>';
             }
         });
-    }
-    else {
-        $paymattic_pro__path = WPPAYFORMPRO_DIR_PATH . 'wp-payment-form-pro.php';
-        $plugin = get_plugin_data($paymattic_pro__path);
-        $currentVersion = $plugin['Version'];
-
+    } else {
+        $currentVersion = WPPAYFORM_VERSION;
         if (version_compare($currentVersion, '4.3.2', '>=')) {
             if (!class_exists('FlutterwaveForPaymattic\FlutterwaveProcessor')) {
                 require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/API/FlutterwaveProcessor.php';

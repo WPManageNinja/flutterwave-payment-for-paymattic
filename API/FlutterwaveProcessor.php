@@ -44,7 +44,7 @@ class FlutterwaveProcessor
 
     protected function getPaymentMode($formId = false)
     {
-        $isLive = (new \FlutterwavePaymentForPaymattic\Settings\FlutterwaveSettings())->isLive($formId);
+        $isLive = (new \FlutterwaveForPaymattic\Settings\FlutterwaveSettings())->isLive($formId);
 
         if ($isLive) {
             return 'live';
