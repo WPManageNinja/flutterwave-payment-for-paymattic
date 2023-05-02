@@ -11,6 +11,7 @@ use WPPayForm\App\Models\Submission;
 use FlutterwaveForPaymattic\Settings\FlutterwaveSettings;
 use WPPayForm\App\Models\Transaction;
 
+
 class IPN
 {
     public function init() 
@@ -20,6 +21,7 @@ class IPN
 
     public function verifyIPN()
     {
+
         if (!isset($_REQUEST['wpf_flutterwave_listener'])) {
             return;
         }
@@ -28,7 +30,7 @@ class IPN
         if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
         }
-
+       
         // Set initial post data to empty string
         $post_data = '';
 
@@ -42,12 +44,16 @@ class IPN
 
         $data =  json_decode($post_data); 
 
-        if (!property_exists($data, 'event')) {
-           $this->handleInvoicePaid($data);
+        if(!property_exists($data, 'event')) {
+            return;
+        }
+
+        $event = str_replace('.', '_', $data->event);
+        
+        if ($event == 'charge_completed') {
+           $this->handlePaymentPaid($data->data);
         } else {
-             error_log("specific event");
-             error_log(print_r($data));
-             $this->handleIpn($data);
+             $this->handleIpn($data->data);
         }
        
         exit(200);
@@ -58,31 +64,29 @@ class IPN
         //handle specific events in the future
     }
 
-    protected function handleInvoicePaid($data) 
+    protected function handlePaymentPaid($data) 
     {
-        $invoiceId = $data->id;
-        $externalId = $data->external_id;
+        $transactionId = $data->id;
+
+        if(!$data->status == 'successful') {
+            return;
+        }
 
         //get transaction from database
-        $transaction = Transaction::where('charge_id', $invoiceId)
+        $transaction = Transaction::where('charge_id', $transactionId)
             ->where('payment_method', 'flutterwave')
             ->first();
 
-        if (!$transaction || $transaction->payment_method != 'flutterwave') {
+        if (!$transaction || $transaction->payment_method != 'flutterwave' || $transaction->status === 'paid') {
             return;
         }
 
         $submissionModel = new Submission();
         $submission = $submissionModel->getSubmission($transaction->submission_id);
 
-        if ($submission->submission_hash != $externalId) {
-            // not our invoic
-            return;
-        }
+        $payment = $this->makeApiCall('transactions/'.$transactionId . '/verify', [], $submission->form_id);
 
-        $invoice = $this->makeApiCall('invoices/'. $invoiceId, [], $transaction->form_id, '');
-
-        if (!$invoice || is_wp_error($invoice)) {
+        if(!$payment || is_wp_error($payment)) {
             return;
         }
 
@@ -92,7 +96,7 @@ class IPN
 
         $updateData = [
             'payment_note'     => maybe_serialize($data),
-            'charge_id'        => sanitize_text_field($invoiceId),
+            'charge_id'        => sanitize_text_field($transactionId),
         ];
 
         $flutterwaveProcessor = new FlutterwaveProcessor();

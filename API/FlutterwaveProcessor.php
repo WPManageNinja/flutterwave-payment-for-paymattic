@@ -191,7 +191,6 @@ class FlutterwaveProcessor
     public function handleSessionRedirectBack($data)
     {
 
-        
         $submissionId = intval($data['wppayform_payment']);
         $submission = (new Submission())->getSubmission($submissionId);
         $transaction = $this->getLastTransaction($submissionId);
@@ -217,13 +216,19 @@ class FlutterwaveProcessor
 
         $transaction = $this->getLastTransaction($submissionId);
         
-        if (!$transaction || $transaction->payment_method != $this->method || $transaction->status === 'paid' || $paymentStatus != 'successful') {
+        if (!$transaction || $transaction->payment_method != $this->method || $transaction->status === 'paid') {
             return;
         }
         
         do_action('wppayform/form_submission_activity_start', $transaction->form_id);
 
-        $status = 'paid';
+        if ($paymentStatus === 'successful') {
+            $status = 'paid';
+        } else if($paymentStatus === 'failed') {
+            $status = 'failed';
+        } else {
+            $status = 'pending';
+        }
 
         $updateData = [
             'payment_note'     => maybe_serialize($payment),
