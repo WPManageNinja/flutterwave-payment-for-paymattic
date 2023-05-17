@@ -53,8 +53,15 @@ class IPN
         if ($event == 'charge_completed') {
            $this->handlePaymentPaid($data->data);
         } else {
-             $this->handleIpn($data->data);
+            $this->handleIpn($data->data);
         }
+
+        $responseData = [
+            'status' => 'success',
+            'message' => 'Webhook request processed successfully'
+        ];
+
+        wp_send_json_success($responseData, 200);
        
         exit(200);
     }
