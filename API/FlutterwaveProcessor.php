@@ -6,8 +6,12 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
+use FlutterwaveForPaymattic\Settings\FlutterwaveSettings;
 use WPPayForm\Framework\Support\Arr;
 use WPPayForm\App\Models\Transaction;
+use WPPayForm\App\Models\Subscription;
+use WPPayForm\App\Models\OrderItem;
+use WPPayForm\App\Models\SubscriptionTransaction;
 use WPPayForm\App\Models\Form;
 use WPPayForm\App\Models\Submission;
 use WPPayForm\App\Services\PlaceholderParser;
@@ -91,7 +95,7 @@ class FlutterwaveProcessor
         $transaction = $transactionModel->getTransaction($transactionId);
 
         $submission = (new Submission())->getSubmission($submissionId);
-        $this->handleRedirect($transaction, $submission, $form, $paymentMode);
+        $this->handleRedirect($transaction, $submission, $form, $paymentMode,  $hasSubscriptions);
     }
 
     private function getSuccessURL($form, $submission)
@@ -128,7 +132,7 @@ class FlutterwaveProcessor
         ), home_url());
     }
 
-    public function handleRedirect($transaction, $submission, $form, $methodSettings)
+    public function handleRedirect($transaction, $submission, $form, $methodSettings,  $hasSubscriptions)
     {        
         $successUrl = $this->getSuccessURL($form, $submission);
         $listener_url = add_query_arg(array(
@@ -141,6 +145,11 @@ class FlutterwaveProcessor
             'email' => $submission->customer_email,
             'name' => $submission->customer_name,
         );
+
+         // checking for subscription payment
+        if ($hasSubscriptions) {
+            $this->handleSubscription($transaction, $submission, $form, $listener_url, $customer);
+        }
 
         // we need to change according to the payment gateway documentation
         $paymentArgs = array(
@@ -186,6 +195,151 @@ class FlutterwaveProcessor
             'redirect_url' => $paymentLink,
             'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-for-paymattic'),
         ], 200);
+    }
+
+    public function handleSubscription($transaction, $submission, $form, $listener_url, $customer)
+    {
+        $subscriptionModel = new Subscription();
+        $subscriptions = $subscriptionModel->getSubscriptions($submission->id);
+
+        $validSubscriptions = [];
+        foreach ($subscriptions as $subscriptionItem) {
+            if ($subscriptionItem->recurring_amount) {
+                $validSubscriptions[] = $subscriptionItem;
+            }
+        }
+
+        // We just need the first subscriptipn
+        $subscription = $validSubscriptions[0];
+
+        // create the subscription plan
+        $plan = $this->createPlan($submission, $form, $subscription);
+        $planId = Arr::get($plan, 'data.id');
+        
+        $subscriptionModel->updateSubscription($subscriptionItem->id, [
+            'status' => 'intented',
+            'vendor_plan_id' => $planId,
+            'vendor_response' => maybe_serialize($plan),
+        ]);
+
+        $trialDays = intval(Arr::get($subscription, 'trial_days'));
+
+        $amount = intval($subscription->recurring_amount);
+
+        if ($trialDays > 0) {
+            wp_send_json_error(array(
+                'message' => __("Flutterwave doesn't support Trial days yet.", 'wp-payment-form-pro')
+            ), 423);
+        }
+
+        //checking for discoiunts, note: discount will only applied on first transaction
+        $orderItemModel = new OrderItem();
+        $discountItems = $orderItemModel->getDiscountItems($submission->id);
+
+        if ($discountItems) {
+            $amount = $this->recurringAmountAfterDiscount($subscription, $submission);
+        }
+
+        // we need to change according to the payment gateway documentation
+        $paymentArgs = array(
+            'tx_ref' => $submission->submission_hash,
+            'amount' => $amount,
+            'currency' => $submission->currency,
+            'redirect_url' => $listener_url,
+            'customer' => $customer,
+            'payment_plan' => $planId
+        );
+
+    
+        $paymentArgs = apply_filters('wppayform_flutterwave_payment_args', $paymentArgs, $submission, $transaction, $form);
+        $payment = (new IPN())->makeApiCall('payments', $paymentArgs, $form->ID, 'POST');
+      
+        $paymentLink = Arr::get($payment,'data.link');
+         
+        $chargeId = str_replace('https://ravemodal-dev.herokuapp.com/v3/hosted/pay/', '', $paymentLink);
+
+        $currentUserId = get_current_user_id();
+        $paymentData = [
+            'form_id' => $submission->form_id,
+            'submission_id' => $submission->id,
+            'user_id' => $currentUserId,
+            'subscription_id' => $subscription->id,
+            'transaction_type' => 'subscription',
+            'payment_method' => 'flutterwave',
+            'charge_id' => $chargeId,
+            'payment_total' => $amount,
+            'status' => 'pending',
+            'currency' => $submission->currency,
+            'payment_mode' => $submission->payment_mode,
+            'payment_note' => ''
+        ];
+
+        $trasubscriptionTransactionModel = new SubscriptionTransaction();
+        $trasubscriptionTransactionModel->maybeInsertCharge($paymentData);
+
+        do_action('wppayform_log_data', [
+            'form_id' => $form->ID,
+            'submission_id' => $submission->id,
+            'type' => 'activity',
+            'created_by' => 'Paymattic BOT',
+            'title' => 'flutterwave Payment Redirect',
+            'content' => 'User redirect to flutterwave for completing the subscription'
+        ]);
+
+        wp_send_json_success([
+            // 'nextAction' => 'payment',
+            'call_next_method' => 'normalRedirect',
+            'redirect_url' => $paymentLink,
+            'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-for-paymattic'),
+        ], 200);
+    }
+
+    //create new subscription plan
+    public function createPlan($submission, $form, $subscription)
+    {
+        $billingInterval = $subscription->billing_interval;
+        $billingTime = $subscription->bill_times;
+
+        if ($billingInterval == 'month') {
+            $billingInterval = 'monthly';
+        } else if ($billingInterval == 'week') {
+            $billingInterval = 'weekly';
+        } else if ($billingInterval == 'year') {
+            $billingInterval = 'yearly';
+        } else if ($billingInterval == 'daily') {
+            $billingInterval = 'daily';
+        } 
+
+        $trialDays = intval(Arr::get($subscription, 'trial_days'));
+        $signUpFee = intval(Arr::get($subscription, 'initial_amount'));
+
+        if ($signUpFee > 0) {
+            wp_send_json_error(array(
+                'message' => __("Flutterwave doesn't support Signup Fee.", 'wp-payment-form-pro')
+            ), 423);
+        }
+
+        $recurringAmount = intval($subscription->recurring_amount);
+      
+        $subscriptionPlanData = array(
+            'name' => $subscription->item_name,
+            'amount' => $recurringAmount,
+            'interval' => $billingInterval,
+        );
+
+        if ($billingTime > 0) {
+            $subscriptionPlanData['duration'] = $billingTime;
+        }
+
+        $plan = (new IPN())->makeApiCall('payment-plans', $subscriptionPlanData, $form->ID, 'POST');
+
+        if (is_wp_error($plan)) {
+            wp_send_json_success([
+                'message'      => $plan->get_error_message()
+            ], 423);
+        }
+
+        return $plan;
     }
 
     public function handleSessionRedirectBack($data)
@@ -306,12 +460,12 @@ class FlutterwaveProcessor
             'status' => $status,
             'updated_at' => current_time('Y-m-d H:i:s')
         );
+
         $transactionModel->where('id', $transaction->id)->update($data);
 
-        $transaction = $transactionModel->getTransaction($transaction->id);
         SubmissionActivity::createActivity(array(
-            'form_id' => $transaction->form_id,
-            'submission_id' => $transaction->submission_id,
+            'form_id' => $transaction['form_id'],
+            'submission_id' => $transaction['submission_id'],
             'type' => 'info',
             'created_by' => 'PayForm Bot',
             'content' => sprintf(__('Transaction Marked as paid and flutterwave Transaction ID: %s', 'flutterwave-for-paymattic'), $data['charge_id'])
@@ -321,11 +475,55 @@ class FlutterwaveProcessor
         do_action('wppayform/form_payment_success', $submission, $transaction, $transaction->form_id, $updateData);
     }
 
-    public function validateSubscription($paymentItems)
+    public function validateSubscription($paymentItems, $formattedElements, $form_data, $subscriptionItems)
     {
-        wp_send_json_error(array(
-            'message' => __('Subscription with flutterwave is not supported yet!', 'flutterwave-for-paymattic'),
-            'payment_error' => true
-        ), 423);
+        $singleItemTotal = 0;
+        foreach ($paymentItems as $paymentItem) {
+            if ($paymentItem['line_total']) {
+                $singleItemTotal += $paymentItem['line_total'];
+            }
+        }
+
+        $validSubscriptions = [];
+        foreach ($subscriptionItems as $subscriptionItem) {
+            if ($subscriptionItem['recurring_amount']) {
+                $validSubscriptions[] = $subscriptionItem;
+            }
+        }
+
+        if ($singleItemTotal && count($validSubscriptions)) {
+            wp_send_json_error(array(
+                'message' => __('Flutterwave does not support subscriptions payment and Single Amount Payment at one request', 'wp-payment-form-pro'),
+                'payment_error' => true
+            ), 423);
+        }
+
+        if (count($validSubscriptions) > 2) {
+            wp_send_json_error(array(
+                'message' => __('Flutterwave does not support multiple subscriptions at one request', 'wp-payment-form-pro'),
+                'payment_error' => true
+            ), 423);
+        }
+    }
+
+    public static function recurringAmountAfterDiscount($subscription, $submission) 
+    {
+        if (!$subscription || !$submission) {
+            return 0;
+        }
+
+        $recurringAmount = intval($subscription->recurring_amount);
+        $orderItemModel = new OrderItem();
+        $discountItems = $orderItemModel->getDiscountItems($submission->id);
+        if ($discountItems) {
+            $discountTotal = 0;
+            foreach ($discountItems as $discountItem) {
+                $discountTotal += intval($discountItem->line_total);
+            }
+            
+            $recurringAmount -= $discountTotal;
+        }
+
+        return $recurringAmount;
     }
 }
