@@ -123,7 +123,7 @@ class FlutterwaveSettings extends BasePaymentMethod
             ),
             'webhook_desc' => array(
                 'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/how-to-configure-stripe-payment-gateway-in-wordpress-with-paymattic/' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
-                'label' => __('Webhook URL', 'wp-payment-form'),
+                'label' => __('Webhook URL', 'flutterwave-for-paymattic'),
                 'type' => 'html_attr'
             ),
             'is_pro_item' => array(
