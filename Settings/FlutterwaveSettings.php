@@ -1,6 +1,6 @@
 <?php
 
-namespace  FlutterwaveForPaymattic\Settings;
+namespace  FlutterwavePaymentForPaymattic\Settings;
 
 use \WPPayForm\Framework\Support\Arr;
 use \WPPayForm\App\Services\AccessControl;
@@ -22,7 +22,7 @@ class FlutterwaveSettings extends BasePaymentMethod
             'flutterwave',
             'flutterwave',
             [],
-            FLUTTERWAVE_FOR_PAYMATTIC_URL . 'assets/flutterwave.svg' // follow naming convention of logo with lowercase exactly as payment key to avoid logo rendering hassle
+            FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_URL . 'assets/flutterwave.svg' // follow naming convention of logo with lowercase exactly as payment key to avoid logo rendering hassle
         );
     }
 
@@ -85,50 +85,50 @@ class FlutterwaveSettings extends BasePaymentMethod
         return array(
             'payment_mode' => array(
                 'value' => 'test',
-                'label' => __('Payment Mode', 'flutterwave-for-paymattic'),
+                'label' => __('Payment Mode', 'flutterwave-payment-for-paymattic'),
                 'options' => array(
-                    'test' => __('Test Mode', 'flutterwave-for-paymattic'),
-                    'live' => __('Live Mode', 'flutterwave-for-paymattic')
+                    'test' => __('Test Mode', 'flutterwave-payment-for-paymattic'),
+                    'live' => __('Live Mode', 'flutterwave-payment-for-paymattic')
                 ),
                 'type' => 'payment_mode'
             ),
             'test_pub_key' => array(
                 'value' => '',
-                'label' => __('Test Public Key', 'flutterwave-for-paymattic'),
+                'label' => __('Test Public Key', 'flutterwave-payment-for-paymattic'),
                 'type' => 'test_pub_key',
-                'placeholder' => __('Test Public Key', 'flutterwave-for-paymattic')
+                'placeholder' => __('Test Public Key', 'flutterwave-payment-for-paymattic')
             ),
             'test_secret_key' => array(
                 'value' => '',
-                'label' => __('Test Secret Key', 'flutterwave-for-paymattic'),
+                'label' => __('Test Secret Key', 'flutterwave-payment-for-paymattic'),
                 'type' => 'test_secret_key',
-                'placeholder' => __('Test Secret Key', 'flutterwave-for-paymattic')
+                'placeholder' => __('Test Secret Key', 'flutterwave-payment-for-paymattic')
             ),
             'live_pub_key' => array(
                 'value' => '',
-                'label' => __('Live Public Key', 'flutterwave-for-paymattic'),
+                'label' => __('Live Public Key', 'flutterwave-payment-for-paymattic'),
                 'type' => 'live_pub_key',
-                'placeholder' => __('Live Public Key', 'flutterwave-for-paymattic')
+                'placeholder' => __('Live Public Key', 'flutterwave-payment-for-paymattic')
             ),
             'live_secret_key' => array(
                 'value' => '',
-                'label' => __('Live Secret Key', 'flutterwave-for-paymattic'),
+                'label' => __('Live Secret Key', 'flutterwave-payment-for-paymattic'),
                 'type' => 'live_secret_key',
-                'placeholder' => __('Live Secret Key', 'flutterwave-for-paymattic')
+                'placeholder' => __('Live Secret Key', 'flutterwave-payment-for-paymattic')
             ),
             'desc' => array(
                 'value' => '<p>See our <a href="https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic" target="_blank" rel="noopener">documentation</a> to get more information about flutterwave setup.</p>',
                 'type' => 'html_attr',
-                'placeholder' => __('Description', 'flutterwave-for-paymattic')
+                'placeholder' => __('Description', 'flutterwave-payment-for-paymattic')
             ),
             'webhook_desc' => array(
                 'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic#webhook' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
-                'label' => __('Webhook URL', 'flutterwave-for-paymattic'),
+                'label' => __('Webhook URL', 'flutterwave-payment-for-paymattic'),
                 'type' => 'html_attr'
             ),
             'is_pro_item' => array(
                 'value' => 'yes',
-                'label' => __('PayPal', 'flutterwave-for-paymattic'),
+                'label' => __('PayPal', 'flutterwave-payment-for-paymattic'),
             ),
         );
     }
@@ -140,13 +140,13 @@ class FlutterwaveSettings extends BasePaymentMethod
 
         if ($mode == 'test') {
             if (empty(Arr::get($settings, 'test_secret_key'))) {
-                $errors['test_api_key'] = __('Please provide Test Secret Key', 'flutterwave-for-paymattic');
+                $errors['test_api_key'] = __('Please provide Test Secret Key', 'flutterwave-payment-for-paymattic');
             }
         }
 
         if ($mode == 'live') {
             if (empty(Arr::get($settings, 'live_secret_key'))) {
-                $errors['live_api_key'] = __('Please provide Live Secret Key', 'flutterwave-for-paymattic');
+                $errors['live_api_key'] = __('Please provide Live Secret Key', 'flutterwave-payment-for-paymattic');
             }
         }
         return $errors;

@@ -1,6 +1,6 @@
 <?php
 
-namespace FlutterwaveForPaymattic\API;
+namespace FlutterwavePaymentForPaymattic\API;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 use WPPayForm\Framework\Support\Arr;
 use WPPayForm\App\Models\Submission;
-use FlutterwaveForPaymattic\Settings\FlutterwaveSettings;
+use FlutterwavePaymentForPaymattic\Settings\FlutterwaveSettings;
 use WPPayForm\App\Models\Transaction;
 
 

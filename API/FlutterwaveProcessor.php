@@ -1,6 +1,6 @@
 <?php
 
-namespace FlutterwaveForPaymattic\API;
+namespace FlutterwavePaymentForPaymattic\API;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -15,9 +15,9 @@ use WPPayForm\App\Services\ConfirmationHelper;
 use WPPayForm\App\Models\SubmissionActivity;
 
 // can't use namespace as these files are not accessible yet
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveElement.php';
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveSettings.php';
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/API/IPN.php';
+require_once FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveElement.php';
+require_once FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveSettings.php';
+require_once FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_DIR . '/API/IPN.php';
 
 
 class FlutterwaveProcessor
@@ -28,9 +28,9 @@ class FlutterwaveProcessor
 
     public function init()
     {
-        new  \FlutterwaveForPaymattic\Settings\FlutterwaveElement();
-        (new  \FlutterwaveForPaymattic\Settings\FlutterwaveSettings())->init();
-        (new \FlutterwaveForPaymattic\API\IPN())->init();
+        new  \FlutterwavePaymentForPaymattic\Settings\FlutterwaveElement();
+        (new  \FlutterwavePaymentForPaymattic\Settings\FlutterwaveSettings())->init();
+        (new \FlutterwavePaymentForPaymattic\API\IPN())->init();
 
         add_filter('wppayform/choose_payment_method_for_submission', array($this, 'choosePaymentMethod'), 10, 4);
         add_action('wppayform/form_submission_make_payment_flutterwave', array($this, 'makeFormPayment'), 10, 6);
@@ -44,7 +44,7 @@ class FlutterwaveProcessor
 
     protected function getPaymentMode($formId = false)
     {
-        $isLive = (new \FlutterwaveForPaymattic\Settings\FlutterwaveSettings())->isLive($formId);
+        $isLive = (new \FlutterwavePaymentForPaymattic\Settings\FlutterwaveSettings())->isLive($formId);
 
         if ($isLive) {
             return 'live';
@@ -184,7 +184,7 @@ class FlutterwaveProcessor
             // 'nextAction' => 'payment',
             'call_next_method' => 'normalRedirect',
             'redirect_url' => $paymentLink,
-            'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-for-paymattic'),
+            'message'      => __('You are redirecting to flutterwave.com to complete the purchase. Please wait while you are redirecting....', 'flutterwave-payment-for-paymattic'),
         ], 200);
     }
 
@@ -313,7 +313,7 @@ class FlutterwaveProcessor
             'submission_id' => $transaction->submission_id,
             'type' => 'info',
             'created_by' => 'PayForm Bot',
-            'content' => sprintf(__('Transaction Marked as paid and flutterwave Transaction ID: %s', 'flutterwave-for-paymattic'), $data['charge_id'])
+            'content' => sprintf(__('Transaction Marked as paid and flutterwave Transaction ID: %s', 'flutterwave-payment-for-paymattic'), $data['charge_id'])
         ));
 
         do_action('wppayform/form_payment_success_flutterwave', $submission, $transaction, $transaction->form_id, $updateData);
@@ -323,7 +323,7 @@ class FlutterwaveProcessor
     public function validateSubscription($paymentItems)
     {
         wp_send_json_error(array(
-            'message' => __('Subscription with flutterwave is not supported yet!', 'flutterwave-for-paymattic'),
+            'message' => __('Subscription with flutterwave is not supported yet!', 'flutterwave-payment-for-paymattic'),
             'payment_error' => true
         ), 423);
     }

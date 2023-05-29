@@ -1,6 +1,6 @@
 <?php
 
-namespace FlutterwaveForPaymattic\Settings;
+namespace FlutterwavePaymentForPaymattic\Settings;
 
 use WPPayForm\App\Modules\FormComponents\BaseComponent;
 use WPPayForm\Framework\Support\Arr;
@@ -30,7 +30,7 @@ class FlutterwaveElement extends BaseComponent
         $methods['flutterwave'] = array(
             'label' => 'flutterwave',
             'isActive' => true,
-            'logo' => FLUTTERWAVE_FOR_PAYMATTIC_URL . 'assets/flutterwave.svg',
+            'logo' => FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_URL . 'assets/flutterwave.svg',
             'editor_elements' => array(
                 'label' => array(
                     'label' => 'Payment Option Label',
@@ -61,7 +61,7 @@ class FlutterwaveElement extends BaseComponent
                 )
             ),
             'field_options' => array(
-                'label' => __('Flutterwave Payment Gateway', 'flutterwave-for-paymattic')
+                'label' => __('Flutterwave Payment Gateway', 'flutterwave-payment-for-paymattic')
             )
         );
     }
