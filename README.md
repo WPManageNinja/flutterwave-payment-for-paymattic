@@ -17,6 +17,7 @@ Flutterwave is a popular payment gateway based in Nigeria, Ghana, Kenya, South A
 == Feature ==
 * Flutterwave supports transactions in multiple currencies and facilitates payments across Africa and internationally.
 * Easy and smooth checkout process.
+* Flutterwave have built-in security features to detect and prevent fraudulent transactions.
 
 == Screenshots ==
 1. Setup Flutterwave Payment
