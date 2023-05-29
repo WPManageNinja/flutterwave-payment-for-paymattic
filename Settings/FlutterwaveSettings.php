@@ -117,12 +117,12 @@ class FlutterwaveSettings extends BasePaymentMethod
                 'placeholder' => __('Live Secret Key', 'flutterwave-for-paymattic')
             ),
             'desc' => array(
-                'value' => '<p>See our <a href="https://paymattic.com/docs/how-to-integrate-flutterwave-in-wordpress-with-paymattic/" target="_blank" rel="noopener">documentation</a> to get more information about flutterwave setup.</p>',
+                'value' => '<p>See our <a href="https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic" target="_blank" rel="noopener">documentation</a> to get more information about flutterwave setup.</p>',
                 'type' => 'html_attr',
                 'placeholder' => __('Description', 'flutterwave-for-paymattic')
             ),
             'webhook_desc' => array(
-                'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/how-to-configure-stripe-payment-gateway-in-wordpress-with-paymattic/' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
+                'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic#webhook' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
                 'label' => __('Webhook URL', 'flutterwave-for-paymattic'),
                 'type' => 'html_attr'
             ),
