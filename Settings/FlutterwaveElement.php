@@ -18,7 +18,7 @@ class FlutterwaveElement extends BaseComponent
         parent::__construct('flutterwave_gateway_element', 8);
 
         add_action('wppayform/validate_gateway_api_' . $this->gateWayName, array($this, 'validateApi'));
-        add_filter('wppayform/validate_gateway_api_' . $this->gateWayName, function($data, $form) {
+        add_filter('wppayform/validate_gateway_api_' . $this->gateWayName, function ($data, $form) {
             return $this->validateApi();
         }, 2, 10);
         add_action('wppayform/payment_method_choose_element_render_flutterwave', array($this, 'renderForMultiple'), 10, 3);
@@ -77,7 +77,7 @@ class FlutterwaveElement extends BaseComponent
         if (!$this->validateApi()) { ?>
             <p style="color: red">You did not configure Flutterwave payment gateway. Please configure flutterwave payment
                 gateway from <b>Paymattic->Payment Gateway->Flutterwave Settings</b> to start accepting payments</p>
-            <?php return;
+<?php return;
         }
 
         echo '<input data-wpf_payment_method="flutterwave" type="hidden" name="__flutterwave_payment_gateway" value="flutterwave" />';

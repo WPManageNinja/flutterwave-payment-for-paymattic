@@ -14,7 +14,7 @@ use WPPayForm\App\Models\Transaction;
 
 class IPN
 {
-    public function init() 
+    public function init()
     {
         add_action('init', array($this, 'verifyIPN'));
     }
@@ -30,7 +30,7 @@ class IPN
         if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
         }
-       
+
         // Set initial post data to empty string
         $post_data = '';
 
@@ -42,16 +42,16 @@ class IPN
             ini_set('post_max_size', '12M');
         }
 
-        $data =  json_decode($post_data); 
+        $data =  json_decode($post_data);
 
-        if(!property_exists($data, 'event')) {
+        if (!property_exists($data, 'event')) {
             return;
         }
 
         $event = str_replace('.', '_', $data->event);
-        
+
         if ($event == 'charge_completed') {
-           $this->handlePaymentPaid($data->data);
+            $this->handlePaymentPaid($data->data);
         } else {
             $this->handleIpn($data->data);
         }
@@ -62,7 +62,7 @@ class IPN
         ];
 
         wp_send_json_success($responseData, 200);
-       
+
         exit(200);
     }
 
@@ -71,11 +71,11 @@ class IPN
         //handle specific events in the future
     }
 
-    protected function handlePaymentPaid($data) 
+    protected function handlePaymentPaid($data)
     {
         $transactionId = $data->id;
 
-        if(!$data->status == 'successful') {
+        if (!$data->status == 'successful') {
             return;
         }
 
@@ -91,9 +91,9 @@ class IPN
         $submissionModel = new Submission();
         $submission = $submissionModel->getSubmission($transaction->submission_id);
 
-        $payment = $this->makeApiCall('transactions/'.$transactionId . '/verify', [], $submission->form_id);
+        $payment = $this->makeApiCall('transactions/' . $transactionId . '/verify', [], $submission->form_id);
 
-        if(!$payment || is_wp_error($payment)) {
+        if (!$payment || is_wp_error($payment)) {
             return;
         }
 
@@ -108,7 +108,6 @@ class IPN
 
         $flutterwaveProcessor = new FlutterwaveProcessor();
         $flutterwaveProcessor->markAsPaid($status, $updateData, $transaction);
-
     }
 
     public function makeApiCall($path, $args, $formId, $method = 'GET')
@@ -123,15 +122,14 @@ class IPN
         ];
 
         if ($method == 'POST') {
-            $response = wp_remote_post('https://api.flutterwave.com/v3/'.$path, [
+            $response = wp_remote_post('https://api.flutterwave.com/v3/' . $path, [
                 'headers' => $headers,
                 'body' => json_encode($args)
             ]);
         } else {
-            $response = wp_remote_get('https://api.flutterwave.com/v3/'.$path, [
+            $response = wp_remote_get('https://api.flutterwave.com/v3/' . $path, [
                 'headers' => $headers,
             ]);
-            
         }
 
         if (is_wp_error($response)) {

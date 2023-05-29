@@ -2,12 +2,11 @@
 
 /**
  * @package flutterwave-for-paymattic
- * 
- * 
- * 
+ *
+ *
  */
 
-/** 
+/**
  * Plugin Name: Flutterwave for paymattic
  * Plugin URI: https://paymattic.com/
  * Description: Flutterwave payment gateway for paymattic. Flutterwave is the leading payment gateway in Nigeria and all of Africa.
@@ -17,7 +16,7 @@
  * License: GPLv2 or later
  * Text Domain: flutterwave-for-paymattic
  * Domain Path: /language
-*/
+ */
 
 if (!defined('ABSPATH')) {
     exit;
@@ -59,14 +58,15 @@ if (!class_exists('FlutterwaveForPaymattic')) {
             return defined('WPPAYFORMPRO_DIR_PATH') || defined('WPPAYFORMPRO_VERSION');
         }
 
-        public function hasFree() {
-            
+        public function hasFree()
+        {
+
             return defined('WPPAYFORM_VERSION');
         }
 
         public function versionCheck()
         {
-            $currentFreeVersion = WPPAYFORM_VERSION; 
+            $currentFreeVersion = WPPAYFORM_VERSION;
             $currentProVersion = WPPAYFORMPRO_VERSION;
 
             return version_compare($currentFreeVersion, '4.3.2', '>=') && version_compare($currentProVersion, '4.3.2', '>=');
@@ -97,7 +97,7 @@ if (!class_exists('FlutterwaveForPaymattic')) {
 
 
     add_action('init', function () {
-        
+
         $flutterwave = (new FlutterwaveForPaymattic);
 
         if (!$flutterwave->hasFree() || !$flutterwave->hasPro()) {
@@ -107,6 +107,5 @@ if (!class_exists('FlutterwaveForPaymattic')) {
         } else {
             $flutterwave->boot();
         }
-
     });
 }

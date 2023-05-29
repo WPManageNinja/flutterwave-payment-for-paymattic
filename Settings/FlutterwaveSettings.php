@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 
 class FlutterwaveSettings extends BasePaymentMethod
 {
-   /**
+    /**
      * Automatically create global payment settings page
      * @param  String: key, title, routes_query, 'logo')
      */
@@ -26,22 +26,22 @@ class FlutterwaveSettings extends BasePaymentMethod
         );
     }
 
-     /**
+    /**
      * @function mapperSettings, To map key => value before store
      * @function validateSettings, To validate before save settings
      */
 
     public function init()
     {
-        add_filter('wppayform_payment_method_settings_mapper_'.$this->key, array($this, 'mapperSettings'));
-        add_filter('wppayform_payment_method_settings_validation_'.$this->key, array($this, 'validateSettings'), 10, 2);
+        add_filter('wppayform_payment_method_settings_mapper_' . $this->key, array($this, 'mapperSettings'));
+        add_filter('wppayform_payment_method_settings_validation_' . $this->key, array($this, 'validateSettings'), 10, 2);
     }
 
-    public function mapperSettings ($settings)
+    public function mapperSettings($settings)
     {
         return $this->mapper(
-            static::settingsKeys(), 
-            $settings, 
+            static::settingsKeys(),
+            $settings,
             false
         );
     }
@@ -60,21 +60,22 @@ class FlutterwaveSettings extends BasePaymentMethod
         );
     }
 
-    public static function getSettings () {
+    public static function getSettings()
+    {
         $setting = get_option('wppayform_payment_settings_flutterwave', []);
-        
+
         return wp_parse_args($setting, static::settingsKeys());
     }
 
     public function getPaymentSettings()
     {
         $settings = $this->mapper(
-            $this->globalFields(), 
+            $this->globalFields(),
             static::getSettings()
         );
         return array(
             'settings' => $settings
-        ); 
+        );
     }
 
     /**
@@ -122,7 +123,7 @@ class FlutterwaveSettings extends BasePaymentMethod
                 'placeholder' => __('Description', 'flutterwave-for-paymattic')
             ),
             'webhook_desc' => array(
-                'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/how-to-configure-stripe-payment-gateway-in-wordpress-with-paymattic/' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
+                'value' => "<h3>Flutterwave Webhook </h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> " . site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/how-to-configure-stripe-payment-gateway-in-wordpress-with-paymattic/' target='_blank' rel='noopener'>our documentation</a> for more information.</p> <div> <p><b>Please subscribe to these following Webhook events for this URL:</b></p> <ul> <li><code>invoice paid</code></li></ul> </div>",
                 'label' => __('Webhook URL', 'flutterwave-for-paymattic'),
                 'type' => 'html_attr'
             ),

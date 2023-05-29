@@ -15,9 +15,9 @@ use WPPayForm\App\Services\ConfirmationHelper;
 use WPPayForm\App\Models\SubmissionActivity;
 
 // can't use namespace as these files are not accessible yet
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR. '/Settings/FlutterwaveElement.php';
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR. '/Settings/FlutterwaveSettings.php';
-require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR. '/API/IPN.php';
+require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveElement.php';
+require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/Settings/FlutterwaveSettings.php';
+require_once FLUTTERWAVE_FOR_PAYMATTIC_DIR . '/API/IPN.php';
 
 
 class FlutterwaveProcessor
@@ -129,7 +129,7 @@ class FlutterwaveProcessor
     }
 
     public function handleRedirect($transaction, $submission, $form, $methodSettings)
-    {        
+    {
         $successUrl = $this->getSuccessURL($form, $submission);
         $listener_url = add_query_arg(array(
             'wppayform_payment' => $submission->id,
@@ -154,7 +154,7 @@ class FlutterwaveProcessor
         $paymentArgs = apply_filters('wppayform_flutterwave_payment_args', $paymentArgs, $submission, $transaction, $form);
         $payment = (new IPN())->makeApiCall('payments', $paymentArgs, $form->ID, 'POST');
 
-        $paymentLink = Arr::get($payment,'data.link');
+        $paymentLink = Arr::get($payment, 'data.link');
 
         if (is_wp_error($payment)) {
             do_action('wppayform_log_data', [
@@ -198,9 +198,9 @@ class FlutterwaveProcessor
         $transactionId = Arr::get($data, 'transaction_id');
         $paymentStatus = Arr::get($data, 'status');
 
-        $payment = (new IPN())->makeApiCall('transactions/'.$transactionId . '/verify', [], $submission->form_id);
+        $payment = (new IPN())->makeApiCall('transactions/' . $transactionId . '/verify', [], $submission->form_id);
 
-        if(!$payment || is_wp_error($payment)) {
+        if (!$payment || is_wp_error($payment)) {
             return;
         }
 
@@ -215,16 +215,16 @@ class FlutterwaveProcessor
         }
 
         $transaction = $this->getLastTransaction($submissionId);
-        
+
         if (!$transaction || $transaction->payment_method != $this->method || $transaction->status === 'paid') {
             return;
         }
-        
+
         do_action('wppayform/form_submission_activity_start', $transaction->form_id);
 
         if ($paymentStatus === 'successful') {
             $status = 'paid';
-        } else if($paymentStatus === 'failed') {
+        } else if ($paymentStatus === 'failed') {
             $status = 'failed';
         } else {
             $status = 'pending';
@@ -236,7 +236,6 @@ class FlutterwaveProcessor
         ];
 
         $this->markAsPaid($status, $updateData, $transaction);
-        
     }
 
     public function handleRefund($refundAmount, $submission, $vendorTransaction)
