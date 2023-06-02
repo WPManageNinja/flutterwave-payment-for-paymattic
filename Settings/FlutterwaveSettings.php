@@ -68,13 +68,15 @@ class FlutterwaveSettings extends BasePaymentMethod
     {
         $githubApi = "https://api.github.com/repos/WPManageNinja/{$slug}/releases";
 
-        $response = wp_remote_get($githubApi, 
+       $response = wp_remote_get($githubApi, 
         [
             'headers' => array('Accept' => 'application/json',
-            'authorization' => 'bearer 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')
+            'authorization' => 'bearer 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')
         ]);
 
+        // $response = wp_remote_get($githubApi);
         $releases = json_decode($response['body']);
+ 
         if (isset($releases->documentation_url)) {
             return 'no';
         }
