@@ -38,7 +38,7 @@ class FlutterwaveSettings extends BasePaymentMethod
     }
 
     public function mapperSettings ($settings)
-    {
+    { 
         return $this->mapper(
             static::settingsKeys(), 
             $settings, 
@@ -51,13 +51,52 @@ class FlutterwaveSettings extends BasePaymentMethod
      */
     public static function settingsKeys()
     {
+        $slug = 'flutterwave-payment-for-paymattic';
+
+        $updateAvailable = static::checkForUpdate($slug);
         return array(
             'payment_mode' => 'test',
             'live_pub_key' => '',
             'live_secret_key' => '',
             'test_pub_key' => '',
             'test_secret_key' => '',
+            'update_available' => $updateAvailable,
         );
+    }
+
+    public static function checkForUpdate($slug)
+    {
+        $githubApi = "https://api.github.com/repos/WPManageNinja/{$slug}/releases";
+
+        $response = wp_remote_get($githubApi, 
+        [
+            'headers' => array('Accept' => 'application/json',
+            'authorization' => 'bearer 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')
+        ]);
+
+        $releases = json_decode($response['body']);
+        if (isset($releases->documentation_url)) {
+            return 'no';
+        }
+        $latestRelease = $releases[0];
+        $latestVersion = $latestRelease->tag_name;
+    
+        $plugins = get_plugins();
+        $currentVersion = '';
+
+        // Check if the plugin is present
+        foreach ($plugins as $plugin_file => $plugin_data) {
+            // Check if the plugin slug or name matches
+            if ($slug === $plugin_data['TextDomain'] || $slug === $plugin_data['Name']) {
+                $currentVersion = $plugin_data['Version'];
+            }
+        }
+
+        if  (version_compare( $latestVersion, $currentVersion, '>')) {
+            return 'yes';
+        }
+
+        return 'no';
     }
 
     public static function getSettings () {
@@ -72,6 +111,7 @@ class FlutterwaveSettings extends BasePaymentMethod
             $this->globalFields(), 
             static::getSettings()
         );
+
         return array(
             'settings' => $settings
         ); 
@@ -130,6 +170,11 @@ class FlutterwaveSettings extends BasePaymentMethod
                 'value' => 'yes',
                 'label' => __('PayPal', 'flutterwave-payment-for-paymattic'),
             ),
+            'update_available' => array(
+                'value' => 'no',
+                'type' => 'update_check',
+                'label' => __('Update to new version avaiable', 'flutterwave-payment-for-paymattic'),
+            )
         );
     }
 
