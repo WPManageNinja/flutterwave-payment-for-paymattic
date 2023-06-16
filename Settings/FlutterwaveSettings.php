@@ -65,7 +65,7 @@ class FlutterwaveSettings extends BasePaymentMethod
     public static function checkForUpdate($slug)
     {
         $githubApi = "https://api.github.com/repos/WPManageNinja/{$slug}/releases";
-        $result = array(
+        return $result = array(
             'available' => 'no',
             'url' => '',
             'slug' => 'flutterwave-payment-for-paymattic'
