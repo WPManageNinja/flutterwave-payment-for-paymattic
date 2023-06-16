@@ -71,11 +71,11 @@ class FlutterwaveSettings extends BasePaymentMethod
             'slug' => 'flutterwave-payment-for-paymattic'
         );
 
-        // $response = wp_remote_get($githubApi, 
-        // [
-        //     'headers' => array('Accept' => 'application/json',
-        //     'authorization' => 'bearer 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')
-        // ]);
+        $response = wp_remote_get($githubApi, 
+        [
+            'headers' => array('Accept' => 'application/json',
+            'authorization' => 'bearer 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')
+        ]);
 
         $response = wp_remote_get($githubApi);
         $releases = json_decode($response['body']);
@@ -86,6 +86,10 @@ class FlutterwaveSettings extends BasePaymentMethod
         $latestRelease = $releases[0];
         $latestVersion = $latestRelease->tag_name;
         $zipUrl = $latestRelease->zipball_url;
+
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
     
         $plugins = get_plugins();
         $currentVersion = '';
