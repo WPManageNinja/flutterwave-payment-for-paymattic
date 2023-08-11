@@ -154,8 +154,6 @@ class FlutterwaveProcessor
         $paymentArgs = apply_filters('wppayform_flutterwave_payment_args', $paymentArgs, $submission, $transaction, $form);
         $payment = (new IPN())->makeApiCall('payments', $paymentArgs, $form->ID, 'POST');
 
-        $paymentLink = Arr::get($payment, 'data.link');
-
         if (is_wp_error($payment)) {
             do_action('wppayform_log_data', [
                 'form_id' => $submission->form_id,
@@ -166,10 +164,12 @@ class FlutterwaveProcessor
                 'content' => $payment->get_error_message()
             ]);
 
-            wp_send_json_success([
+            wp_send_json_error([
                 'message'      => $payment->get_error_message()
             ], 423);
         }
+
+        $paymentLink = Arr::get($payment, 'data.link');
 
         do_action('wppayform_log_data', [
             'form_id' => $form->ID,
