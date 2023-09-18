@@ -20,7 +20,7 @@ class FlutterwaveSettings extends BasePaymentMethod
     {
         parent::__construct(
             'flutterwave',
-            'flutterwave',
+            'Flutterwave',
             [],
             FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_URL . 'assets/flutterwave.svg' // follow naming convention of logo with lowercase exactly as payment key to avoid logo rendering hassle
         );
