@@ -179,7 +179,7 @@ class FlutterwaveSettings extends BasePaymentMethod
                 'placeholder' => __('Description', 'flutterwave-payment-for-paymattic')
             ),
             'webhook_desc' => array(
-                'value' => "<h3><span style='color: #ef680e; margin-right: 2px'>*</span>Required Flutterwave Webhook Setup</h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.co/settings/developers#callbacks' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic#webhook' target='_blank' rel='noopener'>our documentation</a> for more information.</div>",
+                'value' => "<h3><span style='color: #ef680e; margin-right: 2px'>*</span>Required Flutterwave Webhook Setup</h3> <p>In order for Flutterwave to function completely for payments, you must configure your flutterwave webhooks. Visit your <a href='https://dashboard.flutterwave.com' target='_blank' rel='noopener'>account dashboard</a> to configure them. Please add a webhook endpoint for the URL below. </p> <p><b>Webhook URL: </b><code> ". site_url('?wpf_flutterwave_listener=1') . "</code></p> <p>See <a href='https://paymattic.com/docs/add-flutterwave-payment-gateway-in-paymattic#webhook' target='_blank' rel='noopener'>our documentation</a> for more information.</div>",
                 'label' => __('Webhook URL', 'flutterwave-payment-for-paymattic'),
                 'type' => 'html_attr',
             ),
