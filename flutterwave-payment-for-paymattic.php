@@ -10,7 +10,7 @@
  * Plugin Name: Flutterwave Payment for paymattic
  * Plugin URI: https://paymattic.com/
  * Description: Flutterwave payment gateway for paymattic. Flutterwave is the leading payment gateway in Nigeria and all of Africa.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: WPManageNinja LLC
  * Author URI: https://paymattic.com/
  * License: GPLv2 or later
@@ -27,7 +27,7 @@ defined('ABSPATH') or die;
 define('FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC', true);
 define('FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_DIR', __DIR__);
 define('FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_URL', plugin_dir_url(__FILE__));
-define('FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_VERSION', '1.0.0');
+define('FLUTTERWAVE_PAYMENT_FOR_PAYMATTIC_VERSION', '1.0.1');
 
 
 if (!class_exists('FlutterwavePaymentForPaymattic')) {
